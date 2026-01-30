@@ -89,8 +89,8 @@ async def send_req(client, full_url, method, path, semaphore):
     async with semaphore:
         try:
             requests_count += 1
-            if requests_count % 10 == 0:
-                print(f'Processed {requests_count} requests...', end='\r' )
+            # if requests_count % 10 == 0:
+                # print(f'Processed {requests_count} requests...', end='\r' )
             res = await client.request(
                                     method,
                                     full_url,
@@ -103,13 +103,13 @@ async def send_req(client, full_url, method, path, semaphore):
             # print(f'STATUS: {res.status_code}\n')
         
         # Status 200 on fuzzed input indicates potential BOLA vulnerability
-            if res.status_code == 200:
-                positive_responses.add(path)
-                print(f"WARNING: Potential vulnerability found in: {path}\n")       
+            if res.status_code == 200 and path not in positive_responses:
+                positive_responses.add(path)      
         except Exception as e:
             print(f'Request: {method.upper()} {full_url}')
             print(f"ERROR: {repr(e)}\n")
             canceled_requests.add(path)
+        print(f'Proccesed: {requests_count} requests... | Fiends: {len(positive_responses)} ', end='\r')
         
 
 # Fuzz all path parameters in the API specification
@@ -158,7 +158,7 @@ def save_to_file(pos_resp, can_req):
     filename = os.path.join('results', f"results_{timestamp}.txt") 
     with open(filename, "w") as f:
         if pos_resp:
-            f.write("Endpoints that returned 200 OK with fuzzed payloads:\n")
+            f.write(f"{len(pos_resp)} endpoints that returned 200 OK with fuzzed payloads:\n")
             f.write("=" * 50 + "\n\n")
             f.write("\n".join(sorted(pos_resp)))
             f.write('\n\n')
