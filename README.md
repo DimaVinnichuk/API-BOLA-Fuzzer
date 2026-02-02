@@ -18,7 +18,7 @@ BOLA is when an API doesn't check if you should have access to specific data. Fo
 1. Clone the repository
 2. Install dependencies:
 ```bash
-   pip install requests
+   pip install httpx
 ```
 3. Copy the example config:
 ```bash
