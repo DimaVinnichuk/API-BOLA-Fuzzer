@@ -1,4 +1,3 @@
-import requests
 import json
 from urllib.parse import urljoin
 import warnings
